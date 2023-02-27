@@ -1,15 +1,13 @@
 import '../css/styles.css';
-import debounce from 'lodash.debounce';
 import Notiflix from 'notiflix';
-import { fetchCountries } from "./api/fetchCountries";
-import { countriesMarkup, countryMarkup } from "./markup/markCountries";
+import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
+import { GetGallery } from "./api/GetGallery";
+import { GalleryMarkup } from "./markup/markCountries";
 
 const container = document.querySelector('.country-info')
 const finder = document.querySelector('#search-box')
 
-const DEBOUNCE_DELAY = 300;
-
-finder.addEventListener('input', debounce(serchInputHandler, DEBOUNCE_DELAY))
+finder.addEventListener('input', serchInputHandler)
 
 function serchInputHandler(event) {
     const searchRequest = event.target.value;
