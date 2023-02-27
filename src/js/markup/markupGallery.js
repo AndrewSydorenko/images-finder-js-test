@@ -1,23 +1,24 @@
 
-export const GalleryMarkup = (data, element) => {
-  const markup = `
+export const GalleryMarkup = (data, img) => {
+  const images = data.hits
+  const markup = images.map(img => `
     <div class="photo-card">
-  <img src="" alt="" loading="lazy" />
+  <img src="${img.previewURL}" alt="" loading="lazy" />
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
+      <b>Likes${img.likes}</b>
     </p>
     <p class="info-item">
-      <b>Views</b>
+      <b>Views${img.views}</b>
     </p>
     <p class="info-item">
-      <b>Comments</b>
+      <b>Comments${img.comments}</b>
     </p>
     <p class="info-item">
-      <b>Downloads</b>
+      <b>Downloads${img.downloads}</b>
     </p>
   </div>
-</div>`;
+</div>`).join();
 
   element.innerHTML = '';
   element.insertAdjacentHTML('beforeend', markup);

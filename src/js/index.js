@@ -4,22 +4,21 @@ import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
 import { GetGallery } from "./api/GetGallery";
 import { GalleryMarkup } from "./markup/markCountries";
 
-const container = document.querySelector('.country-info')
-const finder = document.querySelector('#search-box')
+const inputEl = document.querySelector('.input')
 
-finder.addEventListener('input', serchInputHandler)
+inputEl.addEventListener('input', serchInputHandler)
 
 function serchInputHandler(event) {
     const searchRequest = event.target.value;
     if (!searchRequest) {
         return
     }
-    fetchCountries(searchRequest)
+    GetGallery(searchRequest)
 
         .then(data => {
             console.log(data.status);
             if (data.status === 404) {
-                Notiflix.Notify.failure("Oops, there is no country with that name");
+                Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
                 return;
             }
             if (data.length === 1) {
@@ -29,7 +28,7 @@ function serchInputHandler(event) {
                 Notiflix.Notify.info("Too many matches found. Please enter a more specific name.")
                 return;
             }
-            countriesMarkup(data, container)
+            GalleryMarkup(data, container)
 
         }
         )
