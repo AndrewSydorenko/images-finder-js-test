@@ -1,37 +1,51 @@
 import '../css/styles.css';
 import Notiflix from 'notiflix';
-import SimpleLightbox from "simplelightbox/dist/simple-lightbox.esm";
-import { GetGallery } from "./api/GetGallery";
-import { GalleryMarkup } from "./markup/markCountries";
+import { GetImages } from "./api/GetGallery";
+import { GalleryMarkup, galleryClear } from "./markup/markupGallery";
 
-const inputEl = document.querySelector('.input')
+const serchForm = document.querySelector('.search-form')
+const loadMoreBtn = document.querySelector('.load-more')
 
-inputEl.addEventListener('input', serchInputHandler)
+serchForm.addEventListener('submit', serchInputHandler)
+loadMoreBtn.addEventListener('click', loadMoreHandler)
+loadMoreBtn.disabled = true;
+loadMoreBtn.style.display = "none";
+let page = 1;
+let searchRequest = '';
 
-function serchInputHandler(event) {
-    const searchRequest = event.target.value;
+async function serchInputHandler(event) {
+    event.preventDefault();
+    searchRequest = event.target.searchQuery.value.trim();
     if (!searchRequest) {
         return
     }
-    GetGallery(searchRequest)
+    page = 1;
+    const data = await GetImages(searchRequest, page)
+    galleryClear()
+    if (data.hits.length > 0) {
+        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+    }
+    if (data.hits.length === 0) {
+        Notiflix.Notify.failure(`Sorry, there are no images matching your search query. Please try again.`);
+        return
+    }
+    loadMoreBtn.disabled = false;
+    loadMoreBtn.style.display = "flex";
+    GalleryMarkup(data)
+}
+async function loadMoreHandler(event) {
+    page += 1;
+    const data = await GetImages(searchRequest, page)
+    GalleryMarkup(data)
+    if (pageCheck(data.totalHits)) {
+        Notiflix.Notify.info("We're sorry, but you've reached the end of search results.")
+        event.target.disabled = true;
+        loadMoreBtn.style.display = "none";
+    }
 
-        .then(data => {
-            console.log(data.status);
-            if (data.status === 404) {
-                Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-                return;
-            }
-            if (data.length === 1) {
-                countryMarkup(data[0], container)
-                return;
-            } if (data.length > 10) {
-                Notiflix.Notify.info("Too many matches found. Please enter a more specific name.")
-                return;
-            }
-            GalleryMarkup(data, container)
+}
 
-        }
-        )
-
-        .catch(error => container.textContent = error.message);
+function pageCheck(totalHits) {
+    const allPages = Math.ceil(totalHits / 40);
+    return allPages === page;
 }
