@@ -32,6 +32,7 @@ async function serchInputHandler(event) {
     loadMoreBtn.disabled = false;
     loadMoreBtn.style.display = "flex";
     GalleryMarkup(data)
+    event.target.reset()
 }
 async function loadMoreHandler(event) {
     page += 1;
